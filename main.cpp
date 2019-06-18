@@ -5,7 +5,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
-#include <sstream>
+
 
 #ifdef _MSC_VER
 static const char* PATH_SEP = "\\";
@@ -68,81 +68,61 @@ bool donut(int x, int y, int x1, int y1)
     return r2 >= 150 && r2 <= 400;
 }
 
-void writeResult(std::vector<std::pair<int, int>> result){
-    std::ofstream out("../results/a_star_path.txt");
-    std::vector<std::pair <int, int> >::const_iterator i;
+int main(int argc, char** argv) {
 
-    std::stringstream ss;
-    for(i=result.begin(); i != result.end(); ++i)
-    {
-        ss << i->first << " " << i->second << "\n";
+    const size_t expectedFileSize = IMAGE_DIM * IMAGE_DIM;
+    // Address assets relative to application location
+    std::string anchor = std::string(".") + PATH_SEP;
+    std::string pname = argv[0];
+    auto lastpos = pname.find_last_of("/\\");
+    if (lastpos != std::string::npos) {
+        anchor = pname.substr(0, lastpos) + PATH_SEP;
     }
+    auto elevation = loadFile(anchor + "assets" + PATH_SEP + "elevation.data", expectedFileSize);
+    auto overrides = loadFile(anchor + "assets" + PATH_SEP + "overrides.data", expectedFileSize);
 
-    out << ss.str();
-    out.close();
-}
+    std::vector<std::pair<int, int>> result;
+    std::vector<int> performance;
+    implementation::findShortestPath(result, performance, overrides, elevation, ROVER_X, ROVER_Y, BACHELOR_X,
+                                     BACHELOR_Y, WEDDING_X, WEDDING_Y);
+    implementation::writeResult(result);
 
+    std::ofstream of("../results/pic.bmp", std::ofstream::binary);
 
+    visualizer::writeBMP(
+            of,
+            &elevation[0],
+            IMAGE_DIM,
+            IMAGE_DIM,
+            [&](size_t x, size_t y, uint8_t elevation) {
 
+                // Marks interesting positions on the map
+                if (donut(x, y, ROVER_X, ROVER_Y) ||
+                    donut(x, y, BACHELOR_X, BACHELOR_Y) ||
+                    donut(x, y, WEDDING_X, WEDDING_Y)) {
+                    return uint8_t(visualizer::IPV_PATH);
+                }
 
-int main(int argc, char** argv)
-{
-    int task = 2;
-    switch (task) {
-        case 1: {
-                    std::cout << "hello world";}
-        case 2: {
-            const size_t expectedFileSize = IMAGE_DIM * IMAGE_DIM;
-            // Address assets relative to application location
-            std::string anchor = std::string(".") + PATH_SEP;
-            std::string pname = argv[0];
-            auto lastpos = pname.find_last_of("/\\");
-            if (lastpos != std::string::npos) {
-                anchor = pname.substr(0, lastpos) + PATH_SEP;
-            }
-            auto elevation = loadFile(anchor + "assets" + PATH_SEP + "elevation.data", expectedFileSize);
-            auto overrides = loadFile(anchor + "assets" + PATH_SEP + "overrides.data", expectedFileSize);
+                // Signifies water
+                if ((overrides[y * IMAGE_DIM + x] & (OF_WATER_BASIN | OF_RIVER_MARSH)) ||
+                    elevation == 0) {
+                    return uint8_t(visualizer::IPV_WATER);
+                }
 
-            std::vector<std::pair<int, int>> result;
-            std::vector<int> performance;
-            implementation::findShortestPath(result, performance, overrides, elevation, ROVER_X, ROVER_Y, BACHELOR_X, BACHELOR_Y, WEDDING_X, WEDDING_Y);
-            writeResult(result);
-
-            std::ofstream of("../results/pic.bmp", std::ofstream::binary);
-
-            visualizer::writeBMP(
-                    of,
-                    &elevation[0],
-                    IMAGE_DIM,
-                    IMAGE_DIM,
-                    [&](size_t x, size_t y, uint8_t elevation) {
-
-                        // Marks interesting positions on the map
-                        if (donut(x, y, ROVER_X, ROVER_Y) ||
-                            donut(x, y, BACHELOR_X, BACHELOR_Y) ||
-                            donut(x, y, WEDDING_X, WEDDING_Y)) {
-                            return uint8_t(visualizer::IPV_PATH);
-                        }
-
-                        // Signifies water
-                        if ((overrides[y * IMAGE_DIM + x] & (OF_WATER_BASIN | OF_RIVER_MARSH)) ||
-                            elevation == 0) {
-                            return uint8_t(visualizer::IPV_WATER);
-                        }
-
-                        // Signifies normal ground color
-                        if (elevation < visualizer::IPV_ELEVATION_BEGIN) {
-                            elevation = visualizer::IPV_ELEVATION_BEGIN;
-                        }
-                        return elevation;
-                    });
-            of.flush();
-        }
-    }
+                // Signifies normal ground color
+                if (elevation < visualizer::IPV_ELEVATION_BEGIN) {
+                    elevation = visualizer::IPV_ELEVATION_BEGIN;
+                }
+                return elevation;
+            });
+    of.flush();
 #if __APPLE__
     auto res = system("open pic.bmp");
     (void)res;
 #endif
     return 0;
+
 }
+
+
 
