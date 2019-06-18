@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <math.h>       /* sqrt */
 #include <chrono>
+#include <thread>
 
 #include "implementation.h"
 
@@ -348,19 +349,18 @@ void a_star_search
 
         std::vector<GridLocation> path;
         double computation_time = 0;
-        std::chrono::_V2::system_clock::time_point t_start, t_end;
         int path_time = 0;
         for (int i = 0; i < queries.size(); ++i) {
 
             std::cout << "start = " << int(queries.at(i).first.first) << " " << int(queries.at(i).first.second) << std::endl;
             std::cout << "goal = " << int(queries.at(i).second.first) << " " << int(queries.at(i).second.second) << std::endl;
-            // first query
-            GridLocation start = location_to_cell(queries.at(i).first.first, queries.at(i).first.second);
+            
+	     GridLocation start = location_to_cell(queries.at(i).first.first, queries.at(i).first.second);
             GridLocation goal = location_to_cell(queries.at(i).second.first, queries.at(i).second.second);
 
-            t_start = std::chrono::high_resolution_clock::now();
-            dijkstra_search(grid, start, goal, came_from.at(i), cost_so_far.at(i));
-            t_end = std::chrono::high_resolution_clock::now();
+            auto t_start = std::chrono::high_resolution_clock::now();
+            a_star_search(grid, start, goal, came_from.at(i), cost_so_far.at(i));
+            auto t_end = std::chrono::high_resolution_clock::now();
             computation_time += std::chrono::duration<double, std::milli>(t_end-t_start).count();
             std::cout << "computation_time = " << int(computation_time) << std::endl;
 
