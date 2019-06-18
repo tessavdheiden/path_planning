@@ -7,7 +7,7 @@ This project contains two algorithms for planning the quickest path for a rover 
 ### Dijkstra with small rover
 The duration of the path is almost equal to the path length, as the velocity of the rover does not change much when traveling up- or downwards. 
 
-![Dijkstra small rover](results/dijkstra_path_small_with_rover.png)
+![Dijkstra small rover](results/dijkstra_path_with_small_rover.png)
 
 ### Dijkstra with big rover
 The duration of the path is now bigger than the path length. We also see that the algorithm has found an alternative route, since it is more expensive to travel upwards. 
