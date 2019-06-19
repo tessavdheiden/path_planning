@@ -22,8 +22,8 @@ We see that the calculation time is quite large and the bachelor may miss his we
 ## Instructions
 
 ```bash
-cmake --build .                                   # Builds 
-cmake --build . --target all                      # Make executable
+cmake .                                           # Cache 
+cmake --build . --target all                      # Build and gen executable
 ./Bachelor                                        # Finds the path
 ``` 
 
