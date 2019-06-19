@@ -15,13 +15,12 @@
 #include <thread>
 #include <sstream>
 #include <fstream>
+#include <string>
 #include "implementation.h"
+
 
 namespace implementation {
     int SCALE = 4;
-    struct GridLocation {
-        int x, y;
-    };
 
     GridLocation location_to_cell(int c, int r) {
         return GridLocation{c / SCALE, r / SCALE};
@@ -32,10 +31,10 @@ namespace implementation {
     };
 }
 
-namespace std {
+//namespace std {
     /* implement hash function so we can put GridLocation into an unordered_set */
     template<>
-    struct hash<implementation::GridLocation> {
+    struct std::hash<implementation::GridLocation> {
         typedef implementation::GridLocation argument_type;
         typedef std::size_t result_type;
 
@@ -43,10 +42,10 @@ namespace std {
             return std::hash<int>()(id.x ^ (id.y << 4));
         }
     };
-}
+//}
 
 namespace implementation {
-    struct SquareGrid {
+    struct SquareGrid : Grid{
         static std::array<GridLocation, 8> DIRS;
 
         int width, height;
@@ -76,7 +75,7 @@ namespace implementation {
             return walls.find(id) == walls.end();
         }
 
-        std::vector<GridLocation> neighbors(GridLocation id) const {
+        std::vector<GridLocation> neighbors(GridLocation id) const override {
             std::vector<GridLocation> results;
 
             for (GridLocation dir : DIRS) {
@@ -169,10 +168,13 @@ namespace implementation {
     struct GridWithWeights : SquareGrid {
         std::unordered_map<GridLocation, int> forests;
         std::vector<GridLocation> peaks;
-        bool small_car = false;
+        Rover model = SMALL;
 
         GridWithWeights(int w, int h) : SquareGrid(w, h) {}
 
+        void set_model(Rover model_){
+            model = model_;
+        }
         double move_cost(GridLocation from_node, GridLocation to_node) const {
             double length = distance(to_node, from_node);
 
@@ -183,7 +185,7 @@ namespace implementation {
                 if (height == 0)
                     return length;
                 double distance = std::sqrt(std::pow(length, 2.) + std::pow(height, 2.));
-                if (small_car)
+                if (model == SMALL)
                     return distance;
                 else {
                     if (height <
@@ -240,7 +242,7 @@ namespace implementation {
 
     template<typename Location, typename Graph>
     void dijkstra_search
-            (Graph graph,
+            (Graph* graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
@@ -258,8 +260,8 @@ namespace implementation {
                 break;
             }
 
-            for (Location next : graph.neighbors(current)) {
-                double new_cost = cost_so_far[current] + graph.move_cost(current, next); // + graph.cost(current, next);
+            for (Location next : graph->neighbors(current)) {
+                double new_cost = cost_so_far[current] + graph->move_cost(current, next); // + graph.cost(current, next);
                 if (cost_so_far.find(next) == cost_so_far.end()
                     || new_cost < cost_so_far[next]) {
                     cost_so_far[next] = new_cost;
@@ -306,7 +308,7 @@ namespace implementation {
 
     template<typename Location, typename Graph>
     void a_star_search
-            (Graph graph,
+            (Graph* graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
@@ -317,19 +319,6 @@ namespace implementation {
         came_from[start] = start;
         cost_so_far[start] = 0;
 
-        int x = 0;
-        int y = 0;
-        for (auto i = 0; i < graph.peaks.size(); i++) {
-            x += graph.peaks.at(i).x;
-            y += graph.peaks.at(i).y;
-            break;
-
-        }
-        GridLocation steepest_peak;
-
-        steepest_peak.x = int(x);
-        steepest_peak.y = int(y);
-
         while (!frontier.empty()) {
             Location current = frontier.get();
 
@@ -337,13 +326,13 @@ namespace implementation {
                 break;
             }
 
-            for (Location next : graph.neighbors(current)) {
-                double new_cost = cost_so_far[current] + graph.move_cost(current, next); // graph.cost(current, next);
+            for (Location next : graph->neighbors(current)) {
+                double new_cost = cost_so_far[current] + graph->move_cost(current, next); // graph.cost(current, next);
                 if (cost_so_far.find(next) == cost_so_far.end()
                     || new_cost < cost_so_far[next]) {
                     cost_so_far[next] = new_cost;
                     double priority =
-                            new_cost + 0.5 * (1 / heuristic(next, steepest_peak)) + 0.5 * heuristic(next, goal);
+                            new_cost + heuristic(next, goal);
                     frontier.put(next, priority);
                     came_from[next] = current;
                 }
@@ -351,65 +340,47 @@ namespace implementation {
         }
     }
 
-    GridWithWeights make_diagram(const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation) {
+    Grid* make_grid(const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation, Rover rov) {
         int grid_size = std::sqrt(overrides.size()) / SCALE;
-        GridWithWeights grid(grid_size, grid_size);
-        grid.set_walls(overrides);
-        grid.set_weights(elevation);
+        GridWithWeights* grid = new GridWithWeights(grid_size, grid_size);
+        grid->set_model(rov);
+        grid->set_walls(overrides);
+        grid->set_weights(elevation);
         return grid;
     }
 
-    void findShortestPath(std::vector<std::pair<int, int>> &result, std::vector<int> &performance, const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation, int x1, int y1, int x2,
-                          int y2, int x3, int y3) {
-        GridWithWeights grid = make_diagram(overrides, elevation);
+    void findShortestPath(std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
+        std::unordered_map<GridLocation, GridLocation> came_from;
+        std::unordered_map<GridLocation, double> cost_so_far;
 
-        std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> queries(2);
-        queries.at(0) = std::make_pair(std::make_pair(x1, y1), std::make_pair(x2, y2));
-        queries.at(1) = std::make_pair(std::make_pair(x2, y2), std::make_pair(x3, y3));
-        std::vector<std::unordered_map<GridLocation, GridLocation>> came_from(2);
-        std::vector<std::unordered_map<GridLocation, double>> cost_so_far(2);
+        std::cout << "start = " << int(query.first.first) << " " << int(query.first.second) << std::endl;
+        std::cout << "goal = " << int(query.second.first) << " " << int(query.second.second) << std::endl;
 
-        std::vector<GridLocation> path;
-        double computation_time = 0;
-        int path_duration = 0;
-        for (int i = 0; i < queries.size(); ++i) {
+        GridLocation start = location_to_cell(query.first.first, query.first.second);
+        GridLocation goal = location_to_cell(query.second.first, query.second.second);
 
-            std::cout << "start = " << int(queries.at(i).first.first) << " " << int(queries.at(i).first.second)
-                      << std::endl;
-            std::cout << "goal = " << int(queries.at(i).second.first) << " " << int(queries.at(i).second.second)
-                      << std::endl;
+        if (algo == DIJKSTRA)
+            dijkstra_search(grid, start, goal, came_from, cost_so_far);
+        else
+            a_star_search(grid, start, goal, came_from, cost_so_far);
 
-            GridLocation start = location_to_cell(queries.at(i).first.first, queries.at(i).first.second);
-            GridLocation goal = location_to_cell(queries.at(i).second.first, queries.at(i).second.second);
+        int path_duration = cost_so_far[goal];
 
-            auto t_start = std::chrono::high_resolution_clock::now();
-            a_star_search(grid, start, goal, came_from.at(i), cost_so_far.at(i));
-
-            auto t_end = std::chrono::high_resolution_clock::now();
-            computation_time += std::chrono::duration<double, std::milli>(t_end - t_start).count();
-            path_duration += cost_so_far.at(i)[goal];
-
-            std::vector<GridLocation> path_single_query = reconstruct_path(start, goal, came_from.at(i));
-            path.insert(path.end(), path_single_query.begin(), path_single_query.end());
-
-        }
+        std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
 
         std::cout << "path_duration = " << int(path_duration) << std::endl;
         std::cout << "path_length = " << int(path_length(path)) << std::endl;
-        std::cout << "computation_time = " << int(computation_time) << std::endl;
 
-        for (int i = 0; i < path.size(); i++) {
-            result.push_back(cell_to_location(path.at(i)));
-        }
+        for (auto pos : path)
+            result.push_back(cell_to_location(pos));
+    }
 
-    };
-
-    void writeResult(std::vector<std::pair<int, int>> result){
-        std::ofstream out("../results/a_star_path.txt");
+    void writeResult(std::string filepath, std::vector<std::pair<int, int>>& result){
+        std::ofstream out(filepath);
         std::vector<std::pair <int, int> >::const_iterator i;
 
         std::stringstream ss;
-        for(i=result.begin(); i != result.end(); ++i)
+        for(auto i=result.begin(); i != result.end(); ++i)
         {
             ss << i->first << " " << i->second << "\n";
         }

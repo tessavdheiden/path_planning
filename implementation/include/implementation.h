@@ -1,11 +1,24 @@
 #ifndef __IMPLEMENTATION_H__
 #define __IMPLEMENTATION_H__
 
-
+#include <unordered_map>
 
 namespace implementation {
-    void writeResult(std::vector<std::pair<int, int>> result);
-    void findShortestPath(std::vector<std::pair<int, int>>& result, std::vector<int>& performance, const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation, int x1, int y1, int x2, int y2, int x3, int y3);
+    enum Algorithm {DIJKSTRA, A_STAR};
+    enum Rover {SMALL, BIG};
+
+    struct GridLocation {
+        int x, y;
+    };
+    struct Grid{
+        virtual std::vector<GridLocation> neighbors(GridLocation id) const = 0;
+        virtual double move_cost(GridLocation from_node, GridLocation to_node) const = 0;
+    };
+
+    Grid* make_grid(const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation, Rover rov);
+
+    void findShortestPath(std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo);
+    void writeResult(std::string filepath, std::vector<std::pair<int, int>>& result);
 }
 
 #endif // __IMPLEMENTATION_H__
