@@ -20,7 +20,7 @@
 
 
 namespace implementation {
-    int SCALE = 4;
+    int SCALE = 1;
 
     GridLocation location_to_cell(int c, int r) {
         return GridLocation{c / SCALE, r / SCALE};
@@ -201,7 +201,7 @@ namespace implementation {
                         0) // traveling downwards decreases the time, so less costly, decreasing the time with 5%
                         return distance * .95;
                     else
-                        return distance * 5.55; // if this would be equal to the .5 it would travel upwards and downwards as coslty as on flat areas, increase time with 25%
+                        return distance * 1.25; // if this would be equal to the .5 it would travel upwards and downwards as coslty as on flat areas, increase time with 25%
                 }
             }
         }
@@ -360,7 +360,7 @@ namespace implementation {
         printf("(%d, %d)\n", a.first, a.second);
     }
 
-    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
+    void findShortestPath2(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
 
         std::unordered_map<GridLocation, GridLocation> came_from;
         std::unordered_map<GridLocation, double> cost_so_far;
@@ -388,31 +388,25 @@ namespace implementation {
     }
 
 
-
     void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(Grid *,
                                                                                       GridLocation ,
                                                                                       GridLocation ,
                                                                                        std::unordered_map<GridLocation, GridLocation> &,
                                                                                        std::unordered_map<GridLocation, double> &), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query){
-        print_fun(query.first);
+
+        std::cout << "start = "; print_fun(query.first);
+        std::cout << "goal = " ; print_fun(query.second);
         std::unordered_map<GridLocation, GridLocation> came_from;
         std::unordered_map<GridLocation, double> cost_so_far;
         GridLocation start = location_to_cell(query.first.first, query.first.second);
         GridLocation goal = location_to_cell(query.second.first, query.second.second);
         search_fun(grid, start, goal, came_from, cost_so_far);
+        std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
+        std::cout << "path_duration = " << int(cost_so_far[goal]) << std::endl;
+        std::cout << "path_length = " << int(path_length(path)) << std::endl;
+        for (auto pos : path)
+            result.push_back(cell_to_location(pos));
+
     }
 
-    void writeResult(std::string filepath, std::vector<std::pair<int, int>>& result){
-        std::ofstream out(filepath);
-        std::vector<std::pair <int, int> >::const_iterator i;
-
-        std::stringstream ss;
-        for(auto i=result.begin(); i != result.end(); ++i)
-        {
-            ss << i->first << " " << i->second << "\n";
-        }
-
-        out << ss.str();
-        out.close();
-    }
 }

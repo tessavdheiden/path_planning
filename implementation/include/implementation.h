@@ -43,18 +43,6 @@ namespace implementation {
              std::unordered_map<Location, Location> &came_from,
              std::unordered_map<Location, double> &cost_so_far);
 
-    template<typename Location, typename Graph>
-    void search(Graph* graph,
-                Location start,
-                Location goal,
-                std::unordered_map<Location, Location> &came_from,
-                std::unordered_map<Location, double> &cost_so_far) {
-        std::cout << "hello world";
-    }
-
-//    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>),
-//                          std::vector<std::pair<int, int>> &result, Grid *grid,
-//                          const std::pair<std::pair<int, int>, std::pair<int, int>> &query, Algorithm algo = A_STAR);
 
     void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(implementation::Grid *,
                                                                                       implementation::GridLocation ,
@@ -64,7 +52,6 @@ namespace implementation {
                            std::vector<std::pair<int, int>> &result, Grid *grid,
                            const std::pair<std::pair<int, int>, std::pair<int, int>> &query);
 
-    void writeResult(std::string filepath, std::vector<std::pair<int, int>> &result);
 }
 
 

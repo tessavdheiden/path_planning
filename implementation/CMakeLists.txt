@@ -1,6 +1,6 @@
 add_library(implementation
 	implementation.cpp
-	include/implementation.h)
+	include/implementation.h include/planner.h)
 
 
 target_include_directories(implementation PUBLIC
