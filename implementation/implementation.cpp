@@ -165,12 +165,21 @@ namespace implementation {
         return std::sqrt(std::pow((b.x - a.x), 2.) + std::pow((b.y - a.y), 2.));
     }
 
-    struct GridWithWeights : SquareGrid {
+    struct GridWithWeights: SquareGrid {
+        std::unordered_set<GridLocation> forests;
+        GridWithWeights(int w, int h): SquareGrid(w, h) {}
+        double cost(GridLocation from_node, GridLocation to_node) const {
+            return forests.find(to_node) != forests.end()? 5 : 1;
+        }
+    };
+
+
+    struct GridWithWeightsWithCar : GridWithWeights {
         std::unordered_map<GridLocation, int> forests;
         std::vector<GridLocation> peaks;
         Rover model = SMALL;
 
-        GridWithWeights(int w, int h) : SquareGrid(w, h) {}
+        GridWithWeightsWithCar(int w, int h) : GridWithWeights(w, h) {}
 
         void set_model(Rover model_){
             model = model_;
@@ -273,35 +282,6 @@ namespace implementation {
     }
 
 
-    template<typename Location>
-    std::vector<Location> reconstruct_path(
-            Location start, Location goal,
-            std::unordered_map<Location, Location> came_from
-    ) {
-        std::vector<Location> path;
-        Location current = goal;
-        while (current != start) {
-            path.push_back(current);
-            current = came_from[current];
-        }
-        path.push_back(start); // optional
-        std::reverse(path.begin(), path.end());
-        return path;
-    }
-
-    template<typename Location>
-    double path_length(const std::vector<Location> &path) {
-        Location current = path.at(0);
-        double path_length = 0;
-        for (int i = 1; i < path.size(); ++i) {
-            Location next = path.at(i);
-            path_length += distance(current, next);
-            current = next;
-        }
-        return path_length;
-    }
-
-
     inline double heuristic(GridLocation a, GridLocation b) {
         return std::abs(a.x - b.x) + std::abs(a.y - b.y);
     }
@@ -340,21 +320,53 @@ namespace implementation {
         }
     }
 
+    template<typename Location>
+    std::vector<Location> reconstruct_path(
+            Location start, Location goal,
+            std::unordered_map<Location, Location> came_from
+    ) {
+        std::vector<Location> path;
+        Location current = goal;
+        while (current != start) {
+            path.push_back(current);
+            current = came_from[current];
+        }
+        path.push_back(start); // optional
+        std::reverse(path.begin(), path.end());
+        return path;
+    }
+
+    template<typename Location>
+    double path_length(const std::vector<Location> &path) {
+        Location current = path.at(0);
+        double path_length = 0;
+        for (int i = 1; i < path.size(); ++i) {
+            Location next = path.at(i);
+            path_length += distance(current, next);
+            current = next;
+        }
+        return path_length;
+    }
+
     Grid* make_grid(const std::vector<uint8_t>& overrides, const std::vector<uint8_t>& elevation, Rover rov) {
         int grid_size = std::sqrt(overrides.size()) / SCALE;
-        GridWithWeights* grid = new GridWithWeights(grid_size, grid_size);
+        GridWithWeightsWithCar* grid = new GridWithWeightsWithCar(grid_size, grid_size);
         grid->set_model(rov);
         grid->set_walls(overrides);
         grid->set_weights(elevation);
         return grid;
     }
+    void print_coordinate(std::pair<int, int> a){
+        printf("(%d, %d)\n", a.first, a.second);
+    }
 
-    void findShortestPath(std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
+    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
+
         std::unordered_map<GridLocation, GridLocation> came_from;
         std::unordered_map<GridLocation, double> cost_so_far;
 
-        std::cout << "start = " << int(query.first.first) << " " << int(query.first.second) << std::endl;
-        std::cout << "goal = " << int(query.second.first) << " " << int(query.second.second) << std::endl;
+        std::cout << "start = "; print_fun(query.first);
+        std::cout << "goal = " ; print_fun(query.second);
 
         GridLocation start = location_to_cell(query.first.first, query.first.second);
         GridLocation goal = location_to_cell(query.second.first, query.second.second);
@@ -373,6 +385,21 @@ namespace implementation {
 
         for (auto pos : path)
             result.push_back(cell_to_location(pos));
+    }
+
+
+
+    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(Grid *,
+                                                                                      GridLocation ,
+                                                                                      GridLocation ,
+                                                                                       std::unordered_map<GridLocation, GridLocation> &,
+                                                                                       std::unordered_map<GridLocation, double> &), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query){
+        print_fun(query.first);
+        std::unordered_map<GridLocation, GridLocation> came_from;
+        std::unordered_map<GridLocation, double> cost_so_far;
+        GridLocation start = location_to_cell(query.first.first, query.first.second);
+        GridLocation goal = location_to_cell(query.second.first, query.second.second);
+        search_fun(grid, start, goal, came_from, cost_so_far);
     }
 
     void writeResult(std::string filepath, std::vector<std::pair<int, int>>& result){

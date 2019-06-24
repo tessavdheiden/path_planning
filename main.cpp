@@ -75,7 +75,8 @@ void merge_result(std::vector<std::pair<int, int>> &p1, std::vector<std::pair<in
     p1.insert(p1.end(), p2.begin(), p2.end());
 }
 
-static bool MULTI_THREAD = true;
+
+static bool MULTI_THREAD = false;
 
 int main(int argc, char** argv) {
 
@@ -97,19 +98,31 @@ int main(int argc, char** argv) {
 
     implementation::Rover rover = implementation::BIG;
     implementation::Grid* grid = implementation::make_grid(overrides, elevation, rover);
-    implementation::Algorithm algorithm = implementation::A_STAR;
+
     std::string filepath = "../results/a_star_path_big_rover.txt";
+
 
     auto t_start = std::chrono::high_resolution_clock::now();
     if (MULTI_THREAD){
-        std::thread first(implementation::findShortestPath, std::ref(result1), std::ref(grid), std::ref(query1), std::ref(algorithm));
-        std::thread second(implementation::findShortestPath, std::ref(result2), std::ref(grid), std::ref(query2), std::ref(algorithm));
+        std::thread first(implementation::findShortestPath, implementation::print_coordinate, implementation::a_star_search<implementation::GridLocation, implementation::Grid>, std::ref(result1), std::ref(grid), std::ref(query1));
+        std::thread second(implementation::findShortestPath, implementation::print_coordinate, implementation::a_star_search<implementation::GridLocation, implementation::Grid>, std::ref(result2), std::ref(grid), std::ref(query2));
         first.join();
         second.join();
+        std::cout << "hello world";
     }
     else{
-        implementation::findShortestPath(result1, grid, query1, algorithm);
-        implementation::findShortestPath(result2, grid, query2, algorithm);
+        //void (* func_ptr)(int) = &(implementation::search<int>);
+        //func_ptr(1);
+
+        //SearchFunctor a_star_search_functor(dikstra, graph,
+          //                                  start,
+            //                                goal,
+              //                              &came_from,
+                //                            &cost_so_far);
+
+
+        implementation::findShortestPath(implementation::print_coordinate, implementation::a_star_search<implementation::GridLocation, implementation::Grid>, result1, grid, query1);
+        //implementation::findShortestPath2(implementation::print_coordinate, func_ptr,  result2, grid, query2);
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
