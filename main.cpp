@@ -5,6 +5,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
+#include <algorithm>
 #include <thread>
 
 
@@ -69,6 +70,12 @@ bool donut(int x, int y, int x1, int y1)
     return r2 >= 150 && r2 <= 400;
 }
 
+bool scatter(int x, int y, std::vector<std::pair<int, int>> vect)
+{
+    std::pair<int, int> xy = std::make_pair(x, y);
+    return std::binary_search(vect.begin(), vect.end(), xy);
+}
+
 int main(int argc, char** argv) {
 
     const size_t expectedFileSize = IMAGE_DIM * IMAGE_DIM;
@@ -83,13 +90,7 @@ int main(int argc, char** argv) {
     auto overrides = loadFile(anchor + "assets" + PATH_SEP + "overrides.data", expectedFileSize);
 
     Planner planner;
-    planner.set_data(overrides, elevation);
-    planner.set_queries({ROVER_X, ROVER_Y, BACHELOR_X, BACHELOR_Y,  WEDDING_X, WEDDING_Y});
-    auto t_start = std::chrono::high_resolution_clock::now();
-    planner.search();
-    auto t_end = std::chrono::high_resolution_clock::now();
-
-    planner.save_result("path.txt");
+    planner.run(overrides, elevation, {ROVER_X, ROVER_Y, BACHELOR_X, BACHELOR_Y, WEDDING_X, WEDDING_Y});
 
     std::ofstream of("../results/pic.bmp", std::ofstream::binary);
 
@@ -116,6 +117,10 @@ int main(int argc, char** argv) {
                 // Signifies normal ground color
                 if (elevation < visualizer::IPV_ELEVATION_BEGIN) {
                     elevation = visualizer::IPV_ELEVATION_BEGIN;
+                }
+
+                if (scatter(x, y, planner.get_result())){
+                    return uint8_t(visualizer::IPV_PATH);
                 }
                 return elevation;
             });

@@ -21,7 +21,7 @@ private:
     std::vector<std::vector<std::pair<int, int>>> paths;
     std::vector<std::pair<int, int>> result;
 
-public:
+
     void set_data(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation) {
         implementation::Rover rover = implementation::SMALL;
         grid = implementation::make_grid(overrides, elevation, rover);
@@ -72,6 +72,23 @@ public:
         out << ss.str();
         out.close();
     }
+public:
+    void run(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation, std::vector<int> vec){
+        set_data(overrides, elevation);
+        set_queries(vec);
+        auto start = std::chrono::high_resolution_clock::now();
+        search();
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        std::cout << "Time taken by algorithm: "
+             << duration.count() << " microseconds" << std::endl;
+        save_result("../results/path.txt");
+
+    }
+    std::vector<std::pair<int, int>> get_result(){
+        return result;
+    }
+
 
 };
 

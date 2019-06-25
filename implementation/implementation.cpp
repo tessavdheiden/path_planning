@@ -20,7 +20,7 @@
 
 
 namespace implementation {
-    int SCALE = 1;
+    int SCALE = 4;
 
     GridLocation location_to_cell(int c, int r) {
         return GridLocation{c / SCALE, r / SCALE};
@@ -187,21 +187,15 @@ namespace implementation {
         double move_cost(GridLocation from_node, GridLocation to_node) const {
             double length = distance(to_node, from_node);
 
-            if ((forests.find(to_node) == forests.end()) or forests.find(from_node) == forests.end()) {
+            if ((forests.find(to_node) == forests.end()) or forests.find(from_node) == forests.end() or (to_node == from_node)) {
                 return length;
             } else {
                 double height = forests.at(to_node) - forests.at(from_node);
-                if (height == 0)
-                    return length;
                 double distance = std::sqrt(std::pow(length, 2.) + std::pow(height, 2.));
                 if (model == SMALL)
                     return distance;
                 else {
-                    if (height <
-                        0) // traveling downwards decreases the time, so less costly, decreasing the time with 5%
-                        return distance * .95;
-                    else
-                        return distance * 1.25; // if this would be equal to the .5 it would travel upwards and downwards as coslty as on flat areas, increase time with 25%
+                    return (height < 0) ? distance * .95 : distance * 1.25; // if traveling downwards, time decreases with 5%. Travel upwards and downwards, may not be equally as coslty as on flat areas, so upwards increases time with 25%
                 }
             }
         }
@@ -360,13 +354,12 @@ namespace implementation {
         printf("(%d, %d)\n", a.first, a.second);
     }
 
-    void findShortestPath2(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
+    void findShortestPath222(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::pair<int, int>), std::vector<std::pair<int, int>>& result, Grid* grid, const std::pair<std::pair<int, int>, std::pair<int, int>>& query, Algorithm algo) {
 
         std::unordered_map<GridLocation, GridLocation> came_from;
         std::unordered_map<GridLocation, double> cost_so_far;
 
-        std::cout << "start = "; print_fun(query.first);
-        std::cout << "goal = " ; print_fun(query.second);
+
 
         GridLocation start = location_to_cell(query.first.first, query.first.second);
         GridLocation goal = location_to_cell(query.second.first, query.second.second);

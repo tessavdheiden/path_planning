@@ -52,6 +52,7 @@ namespace implementation {
                            std::vector<std::pair<int, int>> &result, Grid *grid,
                            const std::pair<std::pair<int, int>, std::pair<int, int>> &query);
 
+
 }
 
 
