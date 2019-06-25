@@ -26,7 +26,13 @@ cmake .                                           # Cache
 cmake --build . --target all                      # Build and gen executable
 ./Bachelor                                        # Finds the path
 ``` 
-
+```bash
+mkdir build                                       
+cd build
+cmake ..                                          # Build and gen executable
+make
+./Bachelor                                        # Finds the path
+``` 
 ## Implemenation
 ### Rover model
 The simple rover is characterized by its velocity, which is 1 cell/s for traveling straight and sqrt(2) cell/s for traveling diagonally. The distance increases with altitude, so traveling up- or downwards is automatically more expensive. For instance, traveling straight in xy-direction and with an elevation of 1 in z-direction increases the distance to sqrt(1 + 1). If we want to make sure that travelling diagonally in xy-direction is different from traveling straight and up- or downwards (avoiding those steep hills), we have to add mass. In code, we simplify this by a factor (e.a. factor=1.05) to multiply with the distance. However, the factor should be different for moving up- and downwards (e.a. factorUp=1.05, factorDown=.97) as moving down would increase the speed. Note that we decrease the speed with 5% for moving upwards (duration increases) and increase the speed with only 3% (reduce duration), because otherwise we do not avoid those hills. 
