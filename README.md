@@ -4,6 +4,11 @@
 
 This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved bij [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path for a small or heavy rover. 
 
+
+![Island](Island.png)
+![A_star](results/a_star.png)
+![Dijkstra](results/dijkstra.png)
+
 ### Dijkstra with small rover
 The duration of the path is almost equal to the path length, as the velocity of the rover does not change much when traveling up- or downwards. 
 
