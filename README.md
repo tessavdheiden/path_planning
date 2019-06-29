@@ -4,14 +4,6 @@
 
 This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved bij [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path for a small or heavy rover. 
 
-![](esults/dijkstra.png "title-1") ![](results/a_star.png "title-2")
-
-<img src="Island.png" width="256" height="256" title="Dijkstra">
-
-<img src="results/dijkstra.png" width="256" height="256" title="Dijkstra">
-
-<img src="results/a_star.png" width="256" height="256" title="A star">
-
 ### Dijkstra with small rover
 The duration of the path is almost equal to the path length, as the velocity of the rover does not change much when traveling up- or downwards. 
 
@@ -54,3 +46,10 @@ The program should not take up too much *computation time*. This is why, I added
 We want the program to run our algorithm and car of *choice* and evaluate or *log* its results. 
 
 If someone else or I would want to work on the code, it should be *understandandable*. For this reason, ... If someone else wants to use it, he/she might have methods with same names, so in order to avoid these naming conflicts, I defined namespace implementation.  
+
+<img src="Island.png" width="256" height="256" title="Dijkstra">
+
+<img src="results/dijkstra.png" width="256" height="256" title="Dijkstra">
+
+<img src="results/a_star.png" width="256" height="256" title="A star">
+
