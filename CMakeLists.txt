@@ -4,14 +4,9 @@ project(Bachelor)
 add_subdirectory(visualizer)
 add_subdirectory(implementation)
 
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-
 add_executable(Bachelor main.cpp)
 target_link_libraries(Bachelor visualizer)
 target_link_libraries(Bachelor implementation)
-target_link_libraries(Bachelor Threads::Threads)
 add_custom_command(
     TARGET Bachelor
     POST_BUILD COMMAND
