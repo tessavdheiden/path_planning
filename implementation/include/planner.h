@@ -3,28 +3,43 @@
 
 #include <iostream>
 #include <vector>
-#include <thread>
+#include <chrono>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <thread>
 #include "implementation.h"
 
 
-std::pair<std::pair<int, int>, std::pair<int, int>> make_query(int x1, int y1, int x2, int y2) {
+std::pair<std::pair<int, int>, std::pair<int, int>> make_query(const int x1, const int y1, const int x2, const int y2) {
     return std::make_pair(std::make_pair(x1, y1), std::make_pair(x2, y2));
 };
 
 class Planner {
+public:
+    void run(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation, const std::vector<int>& vec) {
+        set_data(overrides, elevation);
+        set_queries(vec);
+        auto start = std::chrono::high_resolution_clock::now();
+        search();
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        std::cout << "Time taken by algorithm: "
+                  << duration.count() << " microseconds" << std::endl;
+    }
+
+    std::vector<std::pair<int, int>> get_result() {
+        return result;
+    }
+
 private:
     implementation::Grid *grid;
     std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> queries;
     std::vector<std::vector<std::pair<int, int>>> paths;
     std::vector<std::pair<int, int>> result;
 
-
     void set_data(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation) {
-        implementation::Rover rover = implementation::SMALL;
-        grid = implementation::make_grid(overrides, elevation, rover);
+        grid = implementation::make_grid(overrides, elevation);
     }
 
     void set_queries(std::vector<int> vec) {
@@ -34,19 +49,6 @@ private:
             i += 2;
         }
         paths = std::vector<std::vector<std::pair<int, int>>>(queries.size());
-    }
-
-    void search_threads() {
-        std::vector<std::thread> threads(queries.size());
-
-        for (int i = 0; i < queries.size(); i++) {
-            threads.at(i) = std::thread(implementation::findShortestPath, implementation::print_coordinate,
-                                        implementation::a_star_search<implementation::GridLocation, implementation::Grid>,
-                                        std::ref(paths.at(i)), std::ref(grid), std::ref(queries.at(i)));
-        }
-        for (int i = 0; i < queries.size(); i++) {
-            threads.at(i).join();
-        }
     }
 
     void search() {
@@ -72,23 +74,6 @@ private:
         out << ss.str();
         out.close();
     }
-public:
-    void run(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation, std::vector<int> vec){
-        set_data(overrides, elevation);
-        set_queries(vec);
-        auto start = std::chrono::high_resolution_clock::now();
-        search();
-        auto stop = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << "Time taken by algorithm: "
-             << duration.count() << " microseconds" << std::endl;
-        save_result("../results/path.txt");
-
-    }
-    std::vector<std::pair<int, int>> get_result(){
-        return result;
-    }
-
 
 };
 
