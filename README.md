@@ -21,9 +21,9 @@ In the table below we compare both algorithms. The ultimate goal is to plan the 
 
 |                     | Dijkstra | A star |
 |---------------------|----------|--------|
-| Path duration [s]   | 1332     |        |
-| Path length [cells] | 1517     |        |
-| Planning time [s]   | 599955   |        |
+| Path duration [s]   | 1332     | 1380   |
+| Path length [cells] | 1517     | 1451   |
+| Planning time [s]   | 599955   | 1239644 |
 
 We see that A* requires a longer planning time, while being optimized for reducing computation time! This is because A* favours locations closer to the goal. Since the map contains a lot of rivers, a lot of locations that are closer to the goal are worse, because these will result in a longer path. 
 
