@@ -63,6 +63,7 @@ Whereas the Dijkstra algorithm searches in each direction, A* adds an additional
 
 The simple rover is characterized by its velocity, which is 1 cell/s for traveling straight and sqrt(2) cell/s for traveling diagonally. The distance increases with altitude, so traveling up- or downwards is automatically more expensive. For instance, traveling straight in xy-direction and with an elevation of 1 in z-direction increases the distance to sqrt(1 + 1). 
 
+Moving downwards decreases the path time and upwards increases it. We can model this by changing the time with some X %. However, travelling upwards and downwards, may not be equally as coslty as on flat areas, so upwards should increase the time with some extra percentage.
 
 
 
