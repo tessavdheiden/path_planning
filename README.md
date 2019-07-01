@@ -71,5 +71,9 @@ Below we see the path planned with a small car (top picture) and a heavy car (bo
 
 <img src="results/dijkstra_heavy.png" width="256" height="256" title="Dijkstra">
 
+### Improvements
+- The planner could be implemented with a Builder pattern. An algorithm (Dijktra or A*) receives a type of graph (grid or weighted grid) and a model (small or big). 
+- The rule of five sais that every class requires a user-defined destructor, a user-defined copy constructor, or a user-defined copy assignment operator and move constructor. I did not implement the move and copy constructors, because for this small project, only 1 planner will be used. 
+- The algorithm now receives a raw pointer and the planner's destructor deletes it, but a more safer solution would be that it receives a smart pointer, so memory is automatically managed. 
 
 
