@@ -65,6 +65,11 @@ The simple rover is characterized by its velocity, which is 1 cell/s for traveli
 
 Moving downwards decreases the path time and upwards increases it. We can model this by changing the time with some X %. However, travelling upwards and downwards, may not be equally as coslty as on flat areas, so upwards should increase the time with some extra percentage.
 
+Below we see the path planned with a small car and a heavy car. The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car (bottum picture) tries to avoid the hills more than a smaller car (top picture). 
+
+<img src="results/dijkstra_small.png" width="256" height="256" title="Dijkstra">
+
+<img src="results/dijkstra_heavy.png" width="256" height="256" title="Dijkstra">
 
 
 
