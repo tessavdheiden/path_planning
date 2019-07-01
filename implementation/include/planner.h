@@ -17,6 +17,9 @@ std::pair<std::pair<int, int>, std::pair<int, int>> make_query(const int x1, con
 
 class Planner {
 public:
+    Planner(){};
+    ~Planner(){delete grid;}
+
     void run(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation, const std::vector<int>& vec) {
         set_data(overrides, elevation);
         set_queries(vec);
@@ -54,7 +57,7 @@ private:
     void search() {
         for (int i = 0; i < queries.size(); i++) {
             implementation::findShortestPath(implementation::print_coordinate,
-                                             implementation::a_star_search<implementation::GridLocation, implementation::Grid>,
+                                             implementation::dijkstra_search<implementation::GridLocation, implementation::Grid>,
                                              std::ref(paths.at(i)), grid,
                                              std::ref(queries.at(i)));
         }
