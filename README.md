@@ -57,7 +57,7 @@ The planner is the interface with the main function and seperates the path searc
 ### Implementation details
 There are three basic components to finding the shortest path: A graph structure, a model and an agorithm. 
 
-A graph is a data structure that can tell me the neighbors for each graph location. The weighted graph can also tell me the cost of moving along an edge, so it contains the elevation and overrides data. 
+A graph is a data structure that can tell me the neighbors for each graph location. The weighted graph can also tell me the cost of moving along an edge, so it contains the elevation and overrides data. The overrides data is a hashset, because it only needs to store the locations that are non-traversable. The elevation is a hashmap, because this information also needs to store the cost (0..255) for each location.
 
 Whereas the Dijkstra algorithm searches in each direction, A* adds an additional cost term to guide the search in the direction of the optimal path. This term is called a heuristic, which is often computed by a simple method. For instance, we know that the path should go in the direction of the goal, so we can simply calculate the distance to the goal from each next location. If we need to choose a next location, we take the one that is closer to the goal.
 
