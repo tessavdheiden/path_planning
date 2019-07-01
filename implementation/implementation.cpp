@@ -175,7 +175,7 @@ namespace implementation {
                 return distance;
             } else {
                 double distance_3d = std::sqrt(std::pow(distance, 2.) + std::pow(elevation, 2.));
-                return (elevation < 0) ? distance * .95 : distance *
+                return (elevation < 0) ? distance_3d * .95 : distance_3d *
                                                           1.25; // if traveling downwards, time decreases with 5%. Travel upwards and downwards, may not be equally as coslty as on flat areas, so upwards increases time with 25%
             }
         }
@@ -256,7 +256,7 @@ namespace implementation {
         came_from[start] = start;
         cost_so_far[start] = 0;
 
-        Robot robot;
+        TravelingPoint robot;
 
         while (!frontier.empty()) {
             Location current = frontier.get();
