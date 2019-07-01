@@ -4,7 +4,7 @@
 
 This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved bij [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path. 
 
-The picture below shows three locations: Left lower (rover), middle top (bachelor) and the right lower (wedding).
+The picture below shows three locations: Rover (left lower), Bachelor (middle top) and the wedding (right lower).
 
 <img src="Island.png" width="256" height="256" title="Island and destinations">
 
