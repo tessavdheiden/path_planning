@@ -54,23 +54,22 @@ The project contains the following structure:
 ### Planner 
 The planner is the interface with the main function and seperates the path search from the visualization. We want the program to run our algorithm of choice and evaluate the results, so the planner starts a query and returns a path. The main receves the result and uses the visualizer to also show the path on the island.
 
-### Implementation details
+### Implementation
 There are three basic components to finding the shortest path: A graph structure, a model and an agorithm. 
 
-A graph is a data structure that can tell me the neighbors for each graph location. The weighted graph can also tell me the cost of moving along an edge, so it contains the elevation and overrides data. The overrides data is a hashset, because it only needs to store the locations that are non-traversable. The elevation is a hashmap, because this information also needs to store the cost (0..255) for each location.
+A **graph** is a data structure that can tell me the neighbors for each graph location. The weighted graph can also tell me the cost of moving along an edge, so it contains the elevation and overrides data. The overrides data is a hashset, because it only needs to store the locations that are non-traversable. The elevation is a hashmap, because this information also needs to store the cost (0..255) for each location.
 
-Whereas the Dijkstra algorithm searches in each direction, A* adds an additional cost term to guide the search in the direction of the optimal path. This term is called a heuristic, which is often computed by a simple method. For instance, we know that the path should go in the direction of the goal, so we can simply calculate the distance to the goal from each next location. If we need to choose a next location, we take the one that is closer to the goal.
+Whereas the Dijkstra **algorithm** searches in each direction, A* adds an additional cost term to guide the search in the direction of the optimal path. This term is called a heuristic, which is often computed by a simple method. For instance, we know that the path should go in the direction of the goal, so we can simply calculate the distance to the goal from each next location. If we need to choose a next location, we take the one that is closer to the goal.
 
-The simple rover is characterized by its velocity, which is 1 cell/s for traveling straight and sqrt(2) cell/s for traveling diagonally. The distance increases with altitude, so traveling up- or downwards is automatically more expensive. For instance, traveling straight in xy-direction and with an elevation of 1 in z-direction increases the distance to sqrt(1 + 1). 
+The simple **rover** is characterized by its velocity, which is 1 cell/s for traveling straight and sqrt(2) cell/s for traveling diagonally. The distance increases with altitude, so traveling up- or downwards is automatically more expensive. For instance, traveling straight in xy-direction and with an elevation of 1 in z-direction increases the distance to sqrt(1 + 1). 
 
 Moving downwards decreases the path time and upwards increases it. We can model this by changing the time with some X %. However, travelling upwards and downwards, may not be equally as coslty as on flat areas, so upwards should increase the time with some extra percentage.
 
-Below we see the path planned with a small car and a heavy car. The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car (bottum picture) tries to avoid the hills more than a smaller car (top picture). 
+Below we see the path planned with a small car (top picture) and a heavy car (bottum picture). The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car tries to avoid the hills more than a smaller car. 
 
 <img src="results/dijkstra_small.png" width="256" height="256" title="Dijkstra">
 
 <img src="results/dijkstra_heavy.png" width="256" height="256" title="Dijkstra">
-
 
 
 
