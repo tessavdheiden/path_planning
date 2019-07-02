@@ -16,13 +16,13 @@ namespace implementation {
         virtual double distance(GridLocation from_node, GridLocation to_node) const = 0;
     };
 
-    Grid *make_grid(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation);
+    std::shared_ptr<Grid> make_grid(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation);
 
     void print_coordinate(std::pair<int, int> a);
 
     template<typename Location, typename Graph>
     void dijkstra_search
-            (Graph *graph,
+            (std::shared_ptr<Graph> graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
@@ -30,18 +30,18 @@ namespace implementation {
 
     template<typename Location, typename Graph>
     void a_star_search
-            (Graph* graph,
+            (std::shared_ptr<Graph> graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
              std::unordered_map<Location, double> &cost_so_far);
 
-    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(implementation::Grid *,
+    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::shared_ptr<implementation::Grid>,
                                                                                       implementation::GridLocation ,
                                                                                       implementation::GridLocation ,
                                                                                       std::unordered_map<implementation::GridLocation, implementation::GridLocation> &,
                                                                                       std::unordered_map<implementation::GridLocation, double> &),
-                           std::vector<std::pair<int, int>> &result, Grid *grid,
+                           std::vector<std::pair<int, int>> &result, std::shared_ptr<Grid> grid,
                            const std::pair<std::pair<int, int>, std::pair<int, int>> &query);
 }
 

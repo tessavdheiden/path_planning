@@ -18,7 +18,7 @@ std::pair<std::pair<int, int>, std::pair<int, int>> make_query(const int x1, con
 class Planner {
 public:
     Planner(){};
-    ~Planner(){delete grid;}
+    ~Planner(){}
 
     void run(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation, const std::vector<int>& vec) {
         set_data(overrides, elevation);
@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    implementation::Grid *grid;
+    std::shared_ptr<implementation::Grid> grid;
     std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> queries;
     std::vector<std::vector<std::pair<int, int>>> paths;
     std::vector<std::pair<int, int>> result;
@@ -46,10 +46,8 @@ private:
     }
 
     void set_queries(std::vector<int> vec) {
-        int i = 0;
-        while (i < vec.size() - 2) {
+        for (size_t i = 0; i < vec.size()-2; i+=2){
             queries.push_back(make_query(vec[i], vec[i + 1], vec[i + 2], vec[i + 3]));
-            i += 2;
         }
         paths = std::vector<std::vector<std::pair<int, int>>>(queries.size());
     }
@@ -71,8 +69,9 @@ private:
         std::ofstream out(filepath);
         std::stringstream ss;
 
-        for (auto location : result)
+        for (auto location : result) {
             ss << location.first << " " << location.second << "\n";
+        }
 
         out << ss.str();
         out.close();
