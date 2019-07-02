@@ -1,21 +1,17 @@
-# path_planning
-
 ## Introduction
 
 This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved by [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A\*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path. 
 
 The picture below shows three locations: Rover (left lower), Bachelor (middle top) and the wedding (right lower).
 
-<img src="Island.png" width="256" height="256" title="Island and destinations">
+<p align="center"><img src="Island.png" width="256" height="256" title="Island and destinations">
 
 ## Algorithm choice
-While Breadth First Search explores equally in all directions, Dijkstra’s Algorithm prioritizes which paths to explore. Instead of exploring all possible paths equally, it favors lower cost paths. We can assign lower costs to encourage moving on land and flat areas and higher costs to avoid hills. So, when movement costs vary, we use this instead of Breadth First Search. The picture below shows the path planned by Dijkstra.
+While Breadth First Search explores equally in all directions, Dijkstra’s Algorithm prioritizes which paths to explore. Instead of exploring all possible paths equally, it favors lower cost paths. We can assign lower costs to encourage moving on land and flat areas and higher costs to avoid hills. So, when movement costs vary, we use this instead of Breadth First Search. The picture below shows the path planned by Dijkstra (left).
 
-<img src="results/dijkstra.png" width="256" height="256" title="Dijkstra">
+<p align="center"><img src="results/dijkstra.png" width="256" height="256" title="Dijkstra"> <img src="results/a_star.png" width="256" height="256" title="A star">
 
-A\* is a modification of Dijkstra’s Algorithm that is optimized for a single destination. Dijkstra’s Algorithm can find paths to all locations and A\* finds paths to one location, or the closest of several locations. It prioritizes paths that seem to be leading closer to a goal. The picture below shows the path planned by A\*.
-
-<img src="results/a_star.png" width="256" height="256" title="A star">
+A\* is a modification of Dijkstra’s Algorithm that is optimized for a single destination. Dijkstra’s Algorithm can find paths to all locations and A\* finds paths to one location, or the closest of several locations. It prioritizes paths that seem to be leading closer to a goal. The picture on the right shows the path planned by A\*.
 
 In the table below we compare both algorithms. The ultimate goal is to plan the shortest path. However, if the rover would require a very long planning time, it would still reach his destination very late. 
 
@@ -67,7 +63,7 @@ The simple **rover** is characterized by its velocity, which is 1 cell/s for tra
 
 Moving downwards decreases the path time and upwards increases it. We can model this by changing the time with some X %. However, travelling upwards and downwards, may not be equally as coslty as on flat areas, so upwards should increase the time with some extra percentage.
 
-<img src="results/dijkstra_small.png" width="256" height="256" title="Dijkstra">  <img src="results/dijkstra_heavy.png" width="256" height="256" title="Dijkstra">
+<p align="center"><img src="results/dijkstra_small.png" width="256" height="256" title="Dijkstra">  <img src="results/dijkstra_heavy.png" width="256" height="256" title="Dijkstra">
 
 Here we see the path planned with a small car (left) and a heavy car (right). The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car tries to avoid the hills more than a smaller car. 
 
