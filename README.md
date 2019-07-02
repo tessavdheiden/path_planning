@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved bij [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path. 
+This project contains two algorithms for planning the quickest path for a rover to pick up a bachelor and carry him to his wedding. Shortest path problems are typically solved by [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and it's improved version [A*](https://en.wikipedia.org/wiki/A*_search_algorithm). Follow the instructions below to run find your quickest path. 
 
 The picture below shows three locations: Rover (left lower), Bachelor (middle top) and the wedding (right lower).
 
@@ -65,7 +65,7 @@ The simple **rover** is characterized by its velocity, which is 1 cell/s for tra
 
 Moving downwards decreases the path time and upwards increases it. We can model this by changing the time with some X %. However, travelling upwards and downwards, may not be equally as coslty as on flat areas, so upwards should increase the time with some extra percentage.
 
-Below we see the path planned with a small car (top picture) and a heavy car (bottum picture). The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car tries to avoid the hills more than a smaller car. 
+Below we see the path planned with a small car (top picture) and a heavy car (bottom picture). The more "weight" the car has, the bigger the difference between going up vs going down for the path time. So a heavy car tries to avoid the hills more than a smaller car. 
 
 <img src="results/dijkstra_small.png" width="256" height="256" title="Dijkstra">
 
