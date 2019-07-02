@@ -13,19 +13,19 @@ While Breadth First Search explores equally in all directions, Dijkstra’s Algo
 
 <img src="results/dijkstra.png" width="256" height="256" title="Dijkstra">
 
-A* is a modification of Dijkstra’s Algorithm that is optimized for a single destination. Dijkstra’s Algorithm can find paths to all locations; A* finds paths to one location, or the closest of several locations. It prioritizes paths that seem to be leading closer to a goal. The picture below shows the path planned by A\*.
+A\* is a modification of Dijkstra’s Algorithm that is optimized for a single destination. Dijkstra’s Algorithm can find paths to all locations; A\* finds paths to one location, or the closest of several locations. It prioritizes paths that seem to be leading closer to a goal. The picture below shows the path planned by A\*.
 
 <img src="results/a_star.png" width="256" height="256" title="A star">
 
 In the table below we compare both algorithms. The ultimate goal is to plan the shortest path. However, if the rover would require a very long planning time, it would still reach his destination very late. 
 
-|                     | Dijkstra | A star |
+|                     | Dijkstra | A\* |
 |---------------------|----------|--------|
 | Path duration [s]   | 1332     | 1380   |
 | Path length [cells] | 1517     | 1451   |
 | Planning time [s]   | 599955   | 1239644 |
 
-We see that A* requires a longer planning time, while being optimized for reducing computation time! This is because A* favours locations closer to the goal. Since the map contains a lot of rivers, a lot of locations that are closer to the goal are worse, because these will result in a longer path. 
+We see that A\* requires a longer planning time, while being optimized for reducing computation time! This is because A\* favours locations closer to the goal. Since the map contains a lot of rivers, a lot of locations that are closer to the goal are worse, because these will result in a longer path. 
 
 ## Instructions
 
