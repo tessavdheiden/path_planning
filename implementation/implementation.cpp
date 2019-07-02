@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <math.h>       /* sqrt */
 #include <string>
+#include <memory>
 #include "implementation.h"
 
 
@@ -204,7 +205,7 @@ namespace implementation {
 
     template<typename Location, typename Graph>
     void dijkstra_search
-            (Graph *graph,
+            (std::shared_ptr<Graph> graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
@@ -245,7 +246,7 @@ namespace implementation {
 
     template<typename Location, typename Graph>
     void a_star_search
-            (Graph *graph,
+            (std::shared_ptr<Graph> graph,
              Location start,
              Location goal,
              std::unordered_map<Location, Location> &came_from,
@@ -309,9 +310,9 @@ namespace implementation {
         return path_length;
     }
 
-    Grid *make_grid(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation) {
+    std::shared_ptr<Grid> make_grid(const std::vector<uint8_t> &overrides, const std::vector<uint8_t> &elevation) {
         int grid_size = std::sqrt(overrides.size()) / SCALE;
-        GridWithElevation *grid = new GridWithElevation(grid_size, grid_size);
+        std::shared_ptr<GridWithElevation> grid(new GridWithElevation(grid_size, grid_size));
         grid->set_walls(overrides);
         grid->set_weights(elevation);
         return grid;
@@ -321,12 +322,12 @@ namespace implementation {
         printf("(%d, %d)\n", a.first, a.second);
     }
 
-    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(Grid *,
+    void findShortestPath(void (*print_fun)(std::pair<int, int>), void (*search_fun)(std::shared_ptr<Grid>,
                                                                                      GridLocation,
                                                                                      GridLocation,
                                                                                      std::unordered_map<GridLocation, GridLocation> &,
                                                                                      std::unordered_map<GridLocation, double> &),
-                          std::vector<std::pair<int, int>> &result, Grid *grid,
+                          std::vector<std::pair<int, int>> &result, std::shared_ptr<Grid> grid,
                           const std::pair<std::pair<int, int>, std::pair<int, int>> &query) {
 
         std::cout << "start = ";
@@ -345,7 +346,7 @@ namespace implementation {
             result.push_back(cell_to_location(pos));
     }
 
-    void template_specialization(std::vector<std::pair<int, int>> &result, Grid *grid,
+    void template_specialization(std::vector<std::pair<int, int>> &result, std::shared_ptr<Grid> grid,
                                  const std::pair<std::pair<int, int>, std::pair<int, int>> &query) {
 
         std::unordered_map<GridLocation, GridLocation> came_from;
@@ -355,7 +356,7 @@ namespace implementation {
         a_star_search(grid, start, goal, came_from, cost_so_far);
     }
 
-    void template_specialization_dijkstra(std::vector<std::pair<int, int>> &result, Grid *grid,
+    void template_specialization_dijkstra(std::vector<std::pair<int, int>> &result, std::shared_ptr<Grid> grid,
                                           const std::pair<std::pair<int, int>, std::pair<int, int>> &query) {
 
         std::unordered_map<GridLocation, GridLocation> came_from;
